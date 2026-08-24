@@ -17,6 +17,7 @@ This is an extension of the `safeclaude` command described by Tim Walls in his [
 - Linux OS. MacOS should work too, but is untested.
 - `docker`
 - Your user needs to be in the `docker` group; `sudo usermod -aG docker <username>`
+- `docker-buildx` (e.g. `sudo pacman -S docker-buildx`); this is required by newer docker versions to build custom images.
 - `curl` (to look up the current Claude Code version)
 
 ## :arrow_forward: Install and Use
