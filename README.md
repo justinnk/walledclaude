@@ -10,8 +10,22 @@ The `walledclaude` command should only be used inside version-controlled folders
 
 The sandbox can also be easily adjusted to contain other agentic harnesses, such as [pi](https://github.com/earendil-works/pi) or [opencode](https://github.com/anomalyco/opencode) that support arbitrary LLMs.
 
-This is an extension of the `safeclaude` command described by Tim Walls in his [Blog post](https://snowgoons.ro/posts/2026-05-20-running-claude-code-in-a-docker-container/). I decided to swap the word "safe" to avoid a false sense of security (it is *much* more secure than vanilla Claude Code, but not "totally" secure; see below for the threat model considered).
- 
+This is an extension of the `safeclaude` command described by Tim Walls in his [Blog post](https://snowgoons.ro/posts/2026-05-20-running-claude-code-in-a-docker-container/). I decided to swap the word "safe" to avoid a false sense of security (it is *much* more secure than vanilla Claude Code, but not "totally" secure; see below for the [threat model](#threat-model) considered).
+
+
+## :vs: What you gain over...
+
+- ...Claude's Bash sandbox: isolation of the whole Claude Code process, not just Bash; explicit control on what Claude can access (via volume mounts); network egress control separated from main container (out of the agent's reach).
+- ...a devcontainer: one-time setup and use in any folder without per-repository configuration. Pre-hardened container (e.g., with dropped capabilities); network egress control separated from main container (out of the agent's reach).
+- ...a VM: less overhead and easier setup/configuration.
+
+However, the approach of `walledclaude` is only one point in the above range. What you should use depends on your threat model (see [Threat Model](#threat-model)). See also Claude Code's [documentation on isolation](https://code.claude.com/docs/en/sandbox-environments).
+
+Other takes on the same problem that were brought to my attention:
+- [codingseal](https://github.com/TorbenGl/codingseal) is a more heavyweight option using rootless Podman and with GPU support, but without egress proxy.
+- [claude-code-sandbox](https://github.com/FoamoftheSea/claude-code-sandbox) is a very similar project, also relying on Docker and a Squid proxy for egress control. It guards against a very similar threat model as well.
+- [claude-sbx](https://github.com/tobby-lie/claude-sbx) uses Docker's microVM instead of a standard docker container. This means that the sandbox does not even share the same Linux kernel as the host.
+
 ## :cd: Prerequisites
 
 - Linux OS. MacOS should work too, but is untested.
@@ -42,6 +56,8 @@ Set them using `export NAME=value` in your shell configuration.
 ### Update
 
 To update the Claude version, just run `./build.sh` again.
+
+<a id="threat-model"></a>
 
 ## :imp: Threat Model
 
