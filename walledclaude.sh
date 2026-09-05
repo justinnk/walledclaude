@@ -24,6 +24,29 @@ walledclaude() {
     # comment out if it annoys you.
     set -o xtrace
 
+    local version_controlled=0
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+        || hg root >/dev/null 2>&1 \
+        || svn info >/dev/null 2>&1 \
+        || bzr info >/dev/null 2>&1 \
+        || fossil status >/dev/null 2>&1 \
+        || jj root >/dev/null 2>&1; then
+        version_controlled=1
+    fi
+
+    if [ "$version_controlled" -eq 0 ]; then
+        echo "WARNING: you are apparently launching Claude Code in a folder that is not in version control! This may lead to data loss. Do you really want to continue?"
+        printf "%s" "Continue anyway? [y/N] "
+        read -r REPLY
+        case "$REPLY" in
+            [yY]*) ;;
+            *)
+                set +o xtrace
+                return 1
+                ;;
+        esac
+    fi
+
     local SCRIPT_DIR
     SCRIPT_DIR="$WALLEDCLAUDE_DIR"
     if [ ! -f "$SCRIPT_DIR/squid.conf" ]; then

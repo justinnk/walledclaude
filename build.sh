@@ -18,7 +18,7 @@ IMAGE="claude-code"
 
 # tag with the version so we can go back to older ones when breaking changes
 # occur, and with `latest` so walledclaude.sh has a stable default to launch.
-docker buildx build --build-arg CLAUDE_VERSION="$CLAUDE_VERSION" \
+docker buildx build --network=host --build-arg CLAUDE_VERSION="$CLAUDE_VERSION" \
     -t "$IMAGE:$CLAUDE_VERSION" -t "$IMAGE:latest" .
 
 echo "built $IMAGE:$CLAUDE_VERSION (also tagged $IMAGE:latest)"

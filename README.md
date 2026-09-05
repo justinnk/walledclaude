@@ -36,7 +36,7 @@ Other takes on the same problem that were brought to my attention:
 
 ## :arrow_forward: Install and Use
 
-Run `./build.sh` to build the docker container (this can take a couple of minutes when you first run it). It will be stored for reuse in your local image list.
+Run `./build.sh` to build the docker container (this can take a around four minutes when you first run it). It will be stored for reuse in your local image list.
 Source `walledclaude.sh` in your shell config, such as `~/.zshrc` or `~/.bashrc`, using its *full path*: `source ~/path/to/walledclaude/walledclaude.sh`. This makes the command usable in all your terminal sessions.
 Then, in any directory, run `walledclaude`. This will launch the "walled" Claude container and put you right into a Claude Code session. The startup time will be a bit longer upon first launch, as the Squid image is pulled. Subsequent startups will be much quicker.
 
