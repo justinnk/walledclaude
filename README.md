@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./walledclaude_logo.svg" alt="Walled Claude logo: a blue wall enclosing the orange letter &quot;C&quot;" width="160">
+</p>
+
 # Walled Claude: A Basic Claude Code Docker Sandbox
 
 > :warning: **CAUTION:** This is a hobby project by someone not specialized in security research and provided as-is without any warranties. I coded this in a day based on some code I found on the internet, and refined it over time, also with some help from Claude. It is not a finished product, but here for you to inspect and adapt for your own use. That being said, I have used it myself a lot without any obvious issues so far. If you have any suggestions or found a problem, you are welcome to open an issue.
