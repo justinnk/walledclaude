@@ -10,7 +10,7 @@ LABEL claude-code.version="${CLAUDE_VERSION}"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git less procps ripgrep jq unzip \
     build-essential pkg-config \
-    python3 python3-pip python3-venv \
+    python3 python3-pip python3-venv python-is-python3 \
     poppler-utils qpdf ghostscript tesseract-ocr \
     imagemagick pandoc graphviz \
     fonts-dejavu fonts-liberation \
@@ -25,16 +25,22 @@ RUN pip install --break-system-packages --no-cache-dir \
       python-docx python-pptx openpyxl markitdown \
       pandas numpy scipy matplotlib pillow lxml beautifulsoup4 uv
 
+# Python 3.13 via uv. The install dir is world-writable so further versions can
+# be installed at runtime (temporarily, the container is removed on exit).
+# Runtime installs put their python3.X executables into ~/.local/bin.
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
-RUN uv python install 3.13
+RUN UV_PYTHON_BIN_DIR=/usr/local/bin uv python install 3.13 \
+      && chmod -R a+rwX /opt/uv-python
 
-# install Julia. Adjust paths so the install is visible to the agent. Make writable to let user install packages
+# install Julia. Adjust paths so the install is visible to the agent. Make writable to let user install packages and further versions (juliaup add ...)
 ENV JULIAUP_DEPOT_PATH=/opt/julia
 ENV JULIA_DEPOT_PATH=/opt/julia
-ENV PATH="/opt/julia/bin:${PATH}"
+ENV PATH="/tmp/home/.local/bin:/opt/julia/bin:${PATH}"
 RUN curl -fsSL https://install.julialang.org | sh -s -- -y --path /opt/julia --add-to-path no \
-      && chmod -R a+rX /opt/julia
+      && chmod -R a+rwX /opt/julia
 ENV JULIA_DEPOT_PATH=/tmp/home/.julia:/opt/julia
+# login shells reset PATH in /etc/profile, so restore our additions there
+RUN echo 'export PATH="/tmp/home/.local/bin:/opt/julia/bin:$PATH"' > /etc/profile.d/walledclaude_paths.sh
 
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_VERSION} \
       pdf-lib pdfjs-dist pptxgenjs docx marked tsx typescript
@@ -45,7 +51,7 @@ RUN groupmod -g 1001 node && usermod -u 1001 -g 1001 node
 # some standard environment variables that cause unnecessary warnings.
 ENV MPLCONFIGDIR=/tmp/home/.cache/matplotlib
 ENV XDG_CACHE_HOME=/tmp/home/.cache
-RUN mkdir -p ${MPLCONFIGDIR} ${XDG_CACHE_HOME} /tmp/home/.julia
+RUN mkdir -p ${MPLCONFIGDIR} ${XDG_CACHE_HOME} /tmp/home/.julia /tmp/home/.local/bin
 # We only know the runtime uid/gid at launch, so this home dir must be writable
 # by an arbitrary user. Set the sticky bit just in case. Note,
 # however, that each walledclaude instance is run under the host
